@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:itunes/src/models/albumModel.dart';
 import 'package:itunes/src/provider/itune_provider.dart';
-import 'package:paging/paging.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -17,30 +16,21 @@ class _HomePageState extends State<HomePage> {
   final SnackBar snackBar = const SnackBar(content: Text('Click search'));
 
   // Variables API
-  List<AlbumModel> listaAlbum = [];
-  List<AlbumModel> listaPaginada = [];
+  List<AlbumModel> listaAlbumOriginal = [];
+  List<AlbumModel> listaAlbumPaginada = [];
 
   // Varibles generales
   bool showSearch = false;
   double tamanoSearch = 0;
-  static const int _COUNT = 10;
-
-  Future<List<AlbumModel>> pageData(int previousCount) async {
-    if (listaAlbum.length > 0) {
-      if (previousCount < 50) {
-        for (int i = previousCount; i < previousCount + _COUNT; i++) {
-          listaPaginada.add(listaAlbum[i]);
-        }
-      }
-    }
-    return listaPaginada;
-  }
+  int perPage = 20;
+  int present = 0;
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
+
     List<AlbumModel> listaAlbumTemp = [];
-    await ituneProvider.getListado().then((res) {
+    ituneProvider.getListado().then((res) {
       if (res.length > 0) {
         res.forEach((list) {
           listaAlbumTemp.add(AlbumModel(
@@ -84,7 +74,10 @@ class _HomePageState extends State<HomePage> {
               wrapperType: list.wrapperType));
         });
         setState(() {
-          listaAlbum = listaAlbumTemp;
+          listaAlbumOriginal = listaAlbumTemp;
+          listaAlbumPaginada
+              .addAll(listaAlbumOriginal.getRange(present, present + perPage));
+          present = present + perPage;
         });
       }
     });
@@ -95,6 +88,7 @@ class _HomePageState extends State<HomePage> {
     double tamanoScroll = MediaQuery.of(context).size.height - 100;
 
     return Scaffold(
+      backgroundColor: Color(0xFF181818),
       key: scaffoldKey,
       appBar: AppBar(
         leading: Builder(
@@ -144,17 +138,54 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         children: <Widget>[
           // searchBar(),
-          Container(
-            width: double.infinity,
-            height: tamanoScroll,
-            child: Pagination(
-              pageBuilder: (currentListSize) => pageData(currentListSize),
-              itemBuilder: (index, item) {
-                return album(listaPaginada[index].trackName,
-                    listaPaginada[index].artworkUrl100);
-              },
-            ),
-          ),
+          listaAlbumOriginal.length == 0
+              ? Padding(
+                  padding: EdgeInsets.only(top: 90.0),
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : Expanded(
+                  child: Container(
+                    width: double.infinity,
+                    height: tamanoScroll,
+                    child: ListView.builder(
+                      itemCount: (present <= listaAlbumOriginal.length)
+                          ? listaAlbumPaginada.length + 1
+                          : listaAlbumPaginada.length,
+                      itemBuilder: (context, index) {
+                        return (index == listaAlbumPaginada.length)
+                            ? Container(
+                                color: Color(0xFF00E04A),
+                                child: FlatButton(
+                                  child: Text("Cargar más"),
+                                  onPressed: () {
+                                    setState(() {
+                                      if ((present + perPage) >
+                                          listaAlbumOriginal.length) {
+                                        listaAlbumPaginada.addAll(
+                                            listaAlbumOriginal.getRange(present,
+                                                listaAlbumOriginal.length));
+                                      } else {
+                                        listaAlbumPaginada.addAll(
+                                            listaAlbumOriginal.getRange(
+                                                present, present + perPage));
+                                      }
+                                      present = present + perPage;
+                                    });
+                                  },
+                                ),
+                              )
+                            : album(
+                                listaAlbumPaginada[index].trackName,
+                                listaAlbumPaginada[index].artworkUrl100,
+                                listaAlbumPaginada[index].artistName.toString(),
+                                listaAlbumPaginada[index].collectionName,
+                                listaAlbumPaginada[index].collectionPrice);
+                      },
+                    ),
+                  ),
+                ),
         ],
       ),
     );
@@ -171,25 +202,73 @@ class _HomePageState extends State<HomePage> {
         : Container();
   }
 
-  album(nombre, imagen) {
-    return Container(
-      color: Color(0xFF181818),
-      height: 200.0,
+  album(nombre, imagen, artista, collectionName, collectionPrice) {
+    return InkWell(
+      onTap: () {
+        print('click');
+      },
       child: Container(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              child: Image.network(imagen),
-            ),
-            Container(
-              child: Text(
-                nombre,
-                style: TextStyle(color: Colors.white),
+        padding: EdgeInsets.all(20.0),
+        color: Color(0xFF181818),
+        height: 150.0,
+        child: Container(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                child: Image.network(imagen),
               ),
-            ),
-          ],
+              Container(
+                width: MediaQuery.of(context).size.width * 0.65,
+                padding: EdgeInsets.only(left: 10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          nombre,
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15.0),
+                        ),
+                        Text(
+                          artista.replaceAll('ArtistName.', ''),
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 12.0),
+                          textAlign: TextAlign.left,
+                        ),
+                        Text(
+                          collectionName,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 15.0,
+                          ),
+                          textAlign: TextAlign.left,
+                        ),
+                      ],
+                    ),
+                    Container(
+                      child: Text(
+                        '\$' + collectionPrice.toString(),
+                        style: TextStyle(
+                            color: Color(0xFF00E04A),
+                            fontWeight: FontWeight.w500,
+                            fontSize: 15.0),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
