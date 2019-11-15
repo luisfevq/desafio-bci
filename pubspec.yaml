@@ -15,7 +15,8 @@ dependencies:
   intl: ^0.15.8
   rxdart: ^0.22.0
   shared_preferences: ^0.5.3+4
-  paging:
+  page_transition: "^1.1.5"
+  video_player: ^0.10.2+5
 
   cupertino_icons: ^0.1.2
 

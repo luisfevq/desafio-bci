@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:itunes/src/models/albumModel.dart';
 import 'package:itunes/src/provider/itune_provider.dart';
+import 'package:itunes/src/pages/detail/detail_page.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -181,7 +183,8 @@ class _HomePageState extends State<HomePage> {
                                 listaAlbumPaginada[index].artworkUrl100,
                                 listaAlbumPaginada[index].artistName.toString(),
                                 listaAlbumPaginada[index].collectionName,
-                                listaAlbumPaginada[index].collectionPrice);
+                                listaAlbumPaginada[index].collectionPrice,
+                                listaAlbumPaginada[index].previewUrl);
                       },
                     ),
                   ),
@@ -202,10 +205,19 @@ class _HomePageState extends State<HomePage> {
         : Container();
   }
 
-  album(nombre, imagen, artista, collectionName, collectionPrice) {
+  album(nombre, imagen, artista, collectionName, collectionPrice, previewUrl) {
     return InkWell(
       onTap: () {
-        print('click');
+        Navigator.push(
+          context,
+          PageTransition(
+            type: PageTransitionType.rightToLeft,
+            child: DetailPage(
+              nombre: nombre,
+              previewUrl : previewUrl
+            ),
+          ),
+        );
       },
       child: Container(
         padding: EdgeInsets.all(20.0),

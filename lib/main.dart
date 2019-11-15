@@ -7,6 +7,7 @@ import 'package:itunes/src/shared/preferencias.dart';
 import 'package:itunes/src/settings/routes.dart';
 // Pages
 import 'package:itunes/src/pages/home/home_page.dart';
+import 'package:itunes/src/pages/detail/detail_page.dart';
 
 Future main() async {
 
@@ -27,7 +28,8 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         initialRoute: pagina_home,
         routes: {
-          pagina_home: (BuildContext context) => HomePage(),
+          pagina_home   : (BuildContext context) => HomePage(),
+          pagina_detalle: (BuildContext context) => DetailPage(),
         },
         theme: ThemeData(
           primaryColor: Color(0xFF1E1E1E),
