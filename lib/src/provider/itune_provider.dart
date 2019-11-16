@@ -25,8 +25,8 @@ class ItuneProvider {
 
       if (decodedData != null) {
           decodedData['results'].forEach((data1) {
-            final fumigadoTemp = AlbumModel.fromJson(data1);
-            result.add(fumigadoTemp);
+            final resultTemp = AlbumModel.fromJson(data1);
+            result.add(resultTemp);
           });
       }
     }
