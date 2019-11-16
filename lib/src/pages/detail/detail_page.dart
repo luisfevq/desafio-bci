@@ -6,8 +6,20 @@ import 'package:page_transition/page_transition.dart';
 class DetailPage extends StatefulWidget {
   final String nombre;
   final String previewUrl;
+  final String imagen;
+  final String artista;
+  final String descripcion;
+  final String genero;
+  final String precio;
 
-  DetailPage({this.nombre, this.previewUrl});
+  DetailPage(
+      {this.nombre,
+      this.previewUrl,
+      this.imagen,
+      this.artista,
+      this.descripcion,
+      this.genero,
+      this.precio});
 
   @override
   _DetailPageState createState() => _DetailPageState();
@@ -16,23 +28,26 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage> {
   FlutterSound flutterSound = new FlutterSound();
 
-  bool _loading = false;
   bool paused = false;
   bool playing = false;
+
+  double currentTime = 0.0;
+  double duration = 30.0;
 
   Icon iconPlay = Icon(
     Icons.play_arrow,
     color: Colors.white,
+    size: 30.0,
   );
   Icon iconPause = Icon(
     Icons.pause,
     color: Colors.white,
+    size: 30.0,
   );
 
   @override
   void initState() {
     super.initState();
-    print(widget.previewUrl);
   }
 
   @override
@@ -71,10 +86,13 @@ class _DetailPageState extends State<DetailPage> {
         child: Column(
           children: <Widget>[
             Container(
-                width: double.infinity, height: 200.0, child: Container()),
+                width: double.infinity,
+                height: 140.0,
+                child: Image.network(widget.imagen)),
             Padding(
               padding: const EdgeInsets.only(left: 50.0, right: 50.0),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Builder(
                     builder: (BuildContext context) {
@@ -96,12 +114,19 @@ class _DetailPageState extends State<DetailPage> {
                               }
                               flutterSound.onPlayerStateChanged
                                   .listen((onData) {
-                                if (onData == null) {
+                                setState(() {
+                                  currentTime = onData.currentPosition
+                                          .truncateToDouble() /
+                                      1000;
+                                });
+                                if (onData.duration == onData.currentPosition) {
                                   setState(() {
                                     iconPlay = Icon(
                                       Icons.play_arrow,
                                       color: Colors.white,
+                                      size: 30.0,
                                     );
+                                    currentTime = 30.0;
                                     flutterSound.stopPlayer();
                                     paused = false;
                                     playing = false;
@@ -119,6 +144,7 @@ class _DetailPageState extends State<DetailPage> {
                                 iconPlay = Icon(
                                   Icons.play_arrow,
                                   color: Colors.white,
+                                  size: 30.0,
                                 );
                                 paused = true;
                                 playing = true;
@@ -129,7 +155,56 @@ class _DetailPageState extends State<DetailPage> {
                       );
                     },
                   ),
+                  Container(
+                    padding: EdgeInsets.only(top: 10.0),
+                    child: Row(
+                      children: <Widget>[
+                        SizedBox(
+                          width: 60.0,
+                        ),
+                        Text(
+                          currentTime.toStringAsFixed(2) + '  Seg.',
+                          style: TextStyle(color: Color(0xFF00E04A)),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
+              ),
+            ),
+            Text(
+              widget.artista,
+              style: TextStyle(
+                color: Color(0xFFFAF3FF),
+                fontSize: 40.0,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            Text(
+              widget.descripcion,
+              style: TextStyle(
+                color: Color(0xFF97999B),
+                fontSize: 20.0,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0, bottom: 15.0),
+              child: Text(
+                widget.genero,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Text(
+              '\$ ' + widget.precio,
+              style: TextStyle(
+                color: Color(0xFF00E04A),
+                fontSize: 14.0,
+                fontWeight: FontWeight.w800
               ),
             ),
           ],

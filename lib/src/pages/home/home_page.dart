@@ -70,13 +70,11 @@ class _HomePageState extends State<HomePage> {
       } else {
         setState(() {
           _searchText = _filter.text;
-          print(_searchText.length);
           perPage = 20;
           present = 0;
           listaAlbumOriginal = [];
           listaAlbumPaginada = [];
-          if (_searchText.length > 3) {
-          }
+          if (_searchText.length > 3) {}
           this.cargarListado(_searchText);
         });
       }
@@ -121,7 +119,6 @@ class _HomePageState extends State<HomePage> {
                         fillColor: Colors.white,
                         prefixIcon: InkWell(
                           onTap: () {
-                            print('hehehehe');
                             if (_filter.text.isEmpty) {
                               this.cargarListado('daddy yankee');
                             } else {
@@ -215,7 +212,8 @@ class _HomePageState extends State<HomePage> {
                                 listaAlbumPaginada[index].trackName,
                                 listaAlbumPaginada[index].artistName,
                                 listaAlbumPaginada[index].collectionPrice,
-                                listaAlbumPaginada[index].previewUrl);
+                                listaAlbumPaginada[index].previewUrl,
+                                listaAlbumPaginada[index].primaryGenreName);
                       },
                     ),
                   ),
@@ -226,14 +224,22 @@ class _HomePageState extends State<HomePage> {
   }
 
   album(collectionName, artworkUrl100, trackName, artistName, collectionPrice,
-      previewUrl) {
+      previewUrl, genero) {
     return InkWell(
       onTap: () {
         Navigator.push(
           context,
           PageTransition(
             type: PageTransitionType.rightToLeft,
-            child: DetailPage(nombre: artistName, previewUrl: previewUrl),
+            child: DetailPage(
+              nombre: artistName,
+              previewUrl: previewUrl,
+              artista: artistName,
+              descripcion: trackName,
+              genero: genero.toString(),
+              imagen: artworkUrl100,
+              precio: collectionPrice.toString(),
+            ),
           ),
         );
       },
@@ -307,7 +313,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   cargarListado(String terminoBusqueda) {
-    print(terminoBusqueda);
     List<AlbumModel> listaAlbumTemp = [];
     ituneProvider.getListado(terminoBusqueda).then((res) {
       if (res.length > 0) {

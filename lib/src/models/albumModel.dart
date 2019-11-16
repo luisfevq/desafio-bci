@@ -36,7 +36,7 @@ class AlbumModel {
   int trackTimeMillis;
   Country country;
   Currency currency;
-  PrimaryGenreName primaryGenreName;
+  String primaryGenreName;
   bool isStreamable;
   String collectionArtistName;
   int collectionArtistId;
@@ -112,7 +112,7 @@ class AlbumModel {
         trackTimeMillis: json["trackTimeMillis"],
         country: countryValues.map[json["country"]],
         currency: currencyValues.map[json["currency"]],
-        primaryGenreName: primaryGenreNameValues.map[json["primaryGenreName"]],
+        primaryGenreName: json["primaryGenreName"],
         isStreamable: json["isStreamable"],
         collectionArtistName: json["collectionArtistName"] == null
             ? ''
@@ -159,7 +159,7 @@ class AlbumModel {
         "trackTimeMillis": trackTimeMillis,
         "country": countryValues.reverse[country],
         "currency": currencyValues.reverse[currency],
-        "primaryGenreName": primaryGenreNameValues.reverse[primaryGenreName],
+        "primaryGenreName": primaryGenreName,
         "isStreamable": isStreamable,
         "collectionArtistName":
             collectionArtistName == null ? '' : collectionArtistName,
