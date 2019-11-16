@@ -8,10 +8,10 @@ class ItuneProvider {
   HttpClient httpClient = new HttpClient();
 
   
-  Future<List<AlbumModel>> getListado() async {
+  Future<List<AlbumModel>> getListado(String terminoBusqueda) async {
 
     HttpClientRequest request =
-        await httpClient.getUrl(Uri.parse('https://itunes.apple.com/search?term=in+utero&mediaType=music&limit=50'));
+        await httpClient.getUrl(Uri.parse('https://itunes.apple.com/search?term=${terminoBusqueda}&mediaType=music&limit=50'));
     request.headers.set('content-type', 'application/json');
 
     HttpClientResponse response = await request.close();
