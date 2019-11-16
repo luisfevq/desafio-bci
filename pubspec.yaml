@@ -18,7 +18,7 @@ dependencies:
   page_transition: "^1.1.5"
   video_player: ^0.10.2+5
   dio: "1.0.0"
-  flutter_playout: ^1.0.11
+  flutter_sound: ^1.5.2
 
   cupertino_icons: ^0.1.2
 
